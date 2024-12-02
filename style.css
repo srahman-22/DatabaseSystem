@@ -1,0 +1,167 @@
+/* General Colors */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8e8d8;
+    color: #333;
+}
+
+header {
+    background-color: #1e3a5f;
+    color: #ffd700;
+    padding: 1em;
+    text-align: center;
+    font-family: 'Bangers', cursive;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+nav ul li a {
+    color: #ffd700;
+    text-decoration: none;
+    padding: 0.5em 1em;
+    transition: background-color 0.3s ease;
+}
+
+nav ul li a:hover {
+    background-color: #b8860b;
+    border-radius: 5px;
+}
+
+main {
+    padding: 2em;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: #333;
+}
+
+main section {
+    margin-bottom: 2em;
+    background-color: #1f4e79;
+    padding: 1.5em;
+    border-radius: 10px;
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Footer */
+footer {
+    background-color: #1e3a5f;
+    color: #ffd700;
+    text-align: center;
+    padding: 1em;
+    font-family: 'Bangers', cursive;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+/* Card List Container */
+#card-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    max-width: 100%;
+    padding: 1em;
+}
+
+/* Card Item */
+.card-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 8px;
+    max-width: 150px;
+    /* Reduced width for a more compact layout */
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-size: 0.9em;
+}
+
+.card-item h3 {
+    margin: 5px 0;
+    font-size: 1em;
+    color: #1f4e79;
+}
+
+.card-item p {
+    margin: 5px 0;
+    font-size: 0.85em;
+    color: #555;
+}
+
+/* Button Styles */
+button {
+    padding: 0.5em 1em;
+    background-color: #8b0000;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border-radius: 5px;
+    font-family: 'Poppins', sans-serif;
+}
+
+button:hover {
+    background-color: #b22222;
+}
+
+/* Filter Section */
+#filter-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px;
+    /* Adds spacing between elements */
+}
+
+#type-filter {
+    padding: 5px;
+}
+
+#apply-filter {
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+/* Center the Load More Button */
+#load-more {
+    display: block;
+    margin: 20px auto;
+    /* Centers the button horizontally */
+    padding: 10px 20px;
+    background-color: #8b0000;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+#load-more:hover {
+    background-color: #b22222;
+}
+
+/* Highlight selected card */
+.card-item.selected {
+    border: 2px solid #ffd700;
+    /* Gold border for highlight */
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+    /* Glow effect */
+    background-color: #fef7dc;
+    /* Slightly lighter background */
+}
