@@ -1,12 +1,9 @@
 <?php
 session_start();
-$loggedIn = isset($_SESSION['username']);
-if (!$loggedIn) {
-    // Simulate a guest user session
-    if (!isset($_SESSION['user_id'])) {
-        $_SESSION['user_id'] = 'guest_' . session_id();
-    }
+if (!isset($_SESSION['user_id'])) {
+    $_SESSION['user_id'] = 'guest_' . session_id(); // Create a unique guest user_id
 }
+$loggedIn = isset($_SESSION['username']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -56,69 +53,24 @@ if (!$loggedIn) {
         </div>
         <button id="load-more">Load More</button>
 
-        <!-- Add and Remove Buttons -->
-        <div id="card-actions" style="margin-top: 20px; text-align: center;">
-            <button id="add-card">+</button>
-            <button id="remove-card">-</button>
-        </div>
-
-        <!-- Deck Section -->
-        <div id="deck-section" style="margin-top: 20px;">
-            <h3>Your Deck</h3>
-            <div id="deck-list">
-                <!-- Deck cards will be displayed here -->
+        <!-- Selected Cards Section -->
+        <div id="selected-cards-section" style="margin-top: 20px;">
+            <h3>Selected Cards</h3>
+            <div id="selected-cards">
+                <!-- Selected cards will be displayed here -->
             </div>
+            <button id="save-deck">Save Deck</button>
         </div>
     </main>
 
     <script>
         const limit = 10;
         let offset = 0;
-        let selectedCard = null; // Keep track of the currently selected card
+        let selectedCards = {}; // Temporary storage for selected cards
 
-        function selectCard(cardId) {
-            // Deselect the currently selected card
-            if (selectedCard) {
-                selectedCard.classList.remove('selected');
-            }
-
-            // Highlight the new selected card
-            const newCard = document.getElementById(`card-${cardId}`);
-            newCard.classList.add('selected');
-
-            // Update the selected card
-            selectedCard = newCard;
-
-            console.log(`Card ${cardId} selected`);
-        }
-
-        function modifyCard(action) {
-            if (!selectedCard) {
-                alert("Please select a card first.");
-                return;
-            }
-
-            const cardId = selectedCard.id.split('-')[1]; // Extract card ID from the element's ID
-            const query = `modify_deck.php?action=${action}&card_id=${cardId}`;
-
-            fetch(query)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        loadDeck(); // Reload the deck to reflect changes
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error("Error modifying deck:", error);
-                });
-        }
-
+        // Load cards from the database
         function loadCards(filterType = '') {
             const query = `get_cards.php?limit=${limit}&offset=${offset}&type=${filterType}`;
-            console.log('Fetching:', query);
 
             fetch(query)
                 .then(response => response.json())
@@ -134,81 +86,119 @@ if (!$loggedIn) {
                         data.forEach(card => {
                             const cardItem = document.createElement("div");
                             cardItem.classList.add("card-item");
-                            cardItem.id = `card-${card.id}`; // Add unique ID for each card
-                            cardItem.onclick = () => selectCard(card.id); // Set click event
+                            cardItem.id = `card-${card.id}`;
                             cardItem.innerHTML = `
                                 <h3>${card.name}</h3>
                                 <p>Type: ${card.type}</p>
-                                <p>Quantity: ${card.quantity}</p>
+                                <button onclick="addCard(${card.id}, '${card.name}')">+</button>
+                                <button onclick="removeCard(${card.id})">-</button>
                             `;
                             cardList.appendChild(cardItem);
                         });
 
                         offset += limit;
-                        loadMoreButton.style.display = 'block'; // Show the button if there are more cards
+                        loadMoreButton.style.display = 'block';
                     } else if (offset === 0) {
-                        // No cards found on a new filter
                         cardList.innerHTML = '<p>No cards match your filter. Try a different selection.</p>';
-                        loadMoreButton.style.display = 'none'; // Hide the button
+                        loadMoreButton.style.display = 'none';
                     } else {
-                        // No more cards to load
                         loadMoreButton.style.display = 'none';
                     }
                 })
                 .catch(error => {
                     console.error("Error loading cards:", error);
-                    document.getElementById("card-list").innerHTML = "<p>Failed to load cards. Please try again later.</p>";
                 });
         }
 
-        function loadDeck() {
-    fetch('get_deck.php') // Use a separate PHP script to fetch the deck data
-        .then(response => response.json())
-        .then(data => {
-            const deckList = document.getElementById("deck-list");
-
-            if (data.length > 0) {
-                deckList.innerHTML = ''; // Clear existing deck content
-
-                data.forEach(card => {
-                    const deckItem = document.createElement("div");
-                    deckItem.classList.add("deck-item");
-                    deckItem.innerHTML = `
-                        <h4>${card.name}</h4>
-                        <p>Quantity: ${card.quantity}</p>
-                    `;
-                    deckList.appendChild(deckItem);
-                });
+        // Add a card to the selected cards section
+        function addCard(cardId, cardName) {
+            if (selectedCards[cardId]) {
+                selectedCards[cardId].quantity += 1;
             } else {
-                deckList.innerHTML = '<p>Your deck is empty.</p>';
+                selectedCards[cardId] = { name: cardName, quantity: 1 };
+            }
+            renderSelectedCards();
+        }
+
+        // Remove a card from the selected cards section
+        function removeCard(cardId) {
+            if (selectedCards[cardId]) {
+                selectedCards[cardId].quantity -= 1;
+                if (selectedCards[cardId].quantity <= 0) {
+                    delete selectedCards[cardId];
+                }
+                renderSelectedCards();
+            }
+        }
+
+        // Render the selected cards section
+        function renderSelectedCards() {
+            const selectedCardsDiv = document.getElementById("selected-cards");
+            selectedCardsDiv.innerHTML = '';
+
+            Object.keys(selectedCards).forEach(cardId => {
+                const card = selectedCards[cardId];
+                const cardItem = document.createElement("div");
+                cardItem.innerHTML = `
+                    <h4>${card.name}</h4>
+                    <p>Quantity: ${card.quantity}</p>
+                `;
+                selectedCardsDiv.appendChild(cardItem);
+            });
+        }
+
+        // Save the selected cards to the decks table
+        function saveDeck() {
+    const cards = Object.keys(selectedCards).map(cardId => ({
+        card_id: parseInt(cardId),
+        quantity: selectedCards[cardId].quantity
+    }));
+
+    fetch('modify_deck.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cards })
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json(); // Parse the JSON response
+        })
+        .then(data => {
+            if (data.success) {
+                alert(data.message); // Show success message
+                selectedCards = {}; // Clear selected cards
+                renderSelectedCards();
+            } else {
+                alert(data.message); // Show error message
             }
         })
         .catch(error => {
-            console.error("Error loading deck:", error);
+            console.error("Error saving deck:", error);
+            alert("An error occurred while saving the deck. Please try again.");
         });
 }
 
 
-        // Apply Filter Button Event
+
+
+        // Event listeners
         document.getElementById("apply-filter").addEventListener("click", () => {
             const filterType = document.getElementById("type-filter").value;
-            offset = 0; // Reset offset when applying a new filter
+            offset = 0;
             loadCards(filterType);
         });
 
-        // Load More Button Event
         document.getElementById("load-more").addEventListener("click", () => {
             const filterType = document.getElementById("type-filter").value;
             loadCards(filterType);
         });
 
-        // Add and Remove Button Events
-        document.getElementById("add-card").addEventListener("click", () => modifyCard('add'));
-        document.getElementById("remove-card").addEventListener("click", () => modifyCard('remove'));
+        document.getElementById("save-deck").addEventListener("click", saveDeck);
 
-        // Initial load of cards and deck
+        // Initial load
         loadCards();
-        loadDeck();
     </script>
 </body>
 
