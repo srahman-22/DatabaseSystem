@@ -1,63 +1,7 @@
- CREATE TABLE card (
-  id INT NOT NULL PRIMARY KEY,
-  name VARCHAR(60) NOT NULL UNIQUE
-);
- 
-CREATE TABLE monster (
-  card_name VARCHAR(60) NOT NULL PRIMARY KEY REFERENCES card(name),
-  subtype VARCHAR(60) NOT NULL,
-  attribute VARCHAR(60) NOT NULL,    
-  effect_type VARCHAR(60) DEFAULT NULL,
-  atk INT DEFAULT '0',
-  def INT DEFAULT '0',
-  level INT DEFAULT '1'  
-);
-
-CREATE TABLE spell (
-  card_name VARCHAR(60) NOT NULL PRIMARY KEY REFERENCES card(name),
-  subtype VARCHAR(60) NOT NULL
-);
-
-CREATE TABLE trap (
-  card_name VARCHAR(60) NOT NULL PRIMARY KEY REFERENCES card(name),
-  subtype VARCHAR(60) NOT NULL
-);
-
-CREATE TABLE rankUp (
-  hidden_id INT AUTO_INCREMENT PRIMARY KEY,
-  cXYZ VARCHAR(60) NOT NULL REFERENCES monster(card_name),
-  rankUpSpell VARCHAR(60) NOT NULL REFERENCES spell(card_name)
-);
-
-CREATE TABLE fusings (
-  hidden_id INT AUTO_INCREMENT PRIMARY KEY,
-  fusionSpell VARCHAR(60) NOT NULL REFERENCES spell(card_name),
-  fusionMonster VARCHAR(60) NOT NULL REFERENCES fusionMon(fusionMonster)
-);
-
-CREATE TABLE fusionMon (
-  hidden_id INT AUTO_INCREMENT PRIMARY KEY,
-  fusionMonster VARCHAR(60) NOT NULL REFERENCES monster(card_name),
-  fusionMaterial VARCHAR(60) NOT NULL REFERENCES monster(card_name),
-  quantity INT DEFAULT '1'
-);
-
-CREATE TABLE rituals (
-  ritualSpell VARCHAR(60) NOT NULL PRIMARY KEY REFERENCES spell(card_name),
-  ritualMonster VARCHAR(60) NOT NULL UNIQUE REFERENCES monster(card_name)
-);
-
-CREATE TABLE decks (
-  deck_id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL REFERENCES yugiohusers(id),
-  cards longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL
-);
-
-CREATE TABLE yugiohusers (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  username VARCHAR(60) NOT NULL,
-  password VARCHAR(60) NOT NULL
-);
+CREATE TABLE `card` (
+  `id` int(11) NOT NULL,
+  `name` varchar(60) NOT NULL
+)
 
 INSERT INTO `card` (`id`, `name`) VALUES
 (16, 'Adreus, Keeper of Armageddon'),
@@ -86,14 +30,46 @@ INSERT INTO `card` (`id`, `name`) VALUES
 (8, 'Temple of the Minds Eye'),
 (22, 'The White Stone of Legend');
 
+CREATE TABLE `decks` (
+  `deck_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `cards` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL
+) 
+
+INSERT INTO `decks` (`deck_id`, `user_id`, `cards`) VALUES
+(1, 1, '{\"Blue Eyes White Dragon\":{\"name\":\"Blue Eyes White Dragon\",\"type\":\"Monster\",\"quantity\":3},\"Polymerization\":{\"name\":\"Polymerization\",\"type\":\"Spell\",\"quantity\":1},\"Blue Eyes Ultimate Dragon\":{\"name\":\"Blue Eyes Ultimate Dragon\",\"type\":\"Monster\",\"quantity\":1}}');
+
+CREATE TABLE `fusings` (
+  `hidden_id` int(11) NOT NULL,
+  `fusionSpell` varchar(60) NOT NULL,
+  `fusionMonster` varchar(60) NOT NULL
+) 
+
 INSERT INTO `fusings` (`hidden_id`, `fusionSpell`, `fusionMonster`) VALUES
 (1, 'Polymerization', 'Blue Eyes Ultimate Dragon'),
 (2, 'Polymerization', 'Dragon Master Knight');
+
+CREATE TABLE `fusionMon` (
+  `hidden_id` int(11) NOT NULL,
+  `fusionMonster` varchar(60) NOT NULL,
+  `fusionMaterial` varchar(60) NOT NULL,
+  `quantity` int(11) DEFAULT 1
+) 
 
 INSERT INTO `fusionMon` (`hidden_id`, `fusionMonster`, `fusionMaterial`, `quantity`) VALUES
 (1, 'Blue Eyes Ultimate Dragon', 'Blue Eyes White Dragon', 3),
 (2, 'Dragon Master Knight', 'Blue Eyes Ultimate Dragon', 1),
 (3, 'Dragon Master Knight', 'Black Luster Soldier', 1);
+
+CREATE TABLE `monster` (
+  `card_name` varchar(60) NOT NULL,
+  `subtype` varchar(60) NOT NULL,
+  `attribute` varchar(60) NOT NULL,
+  `effect_type` varchar(60) DEFAULT NULL,
+  `atk` int(11) DEFAULT 0,
+  `def` int(11) DEFAULT 0,
+  `level` int(11) DEFAULT 1
+)
 
 INSERT INTO `monster` (`card_name`, `subtype`, `attribute`, `effect_type`, `atk`, `def`, `level`) VALUES
 ('Adreus Keeper of Armageddon', 'Fiend', 'Dark', 'Effect', 2600, 1700, 5),
@@ -110,11 +86,28 @@ INSERT INTO `monster` (`card_name`, `subtype`, `attribute`, `effect_type`, `atk`
 ('Rabidragon', 'Dragon', 'Light', NULL, 2950, 2900, 8),
 ('The White Stone of Legend', 'Dragon', 'Light', 'Effect', 300, 250, 1);
 
-INSERT INTO `rankUp` (`cXYZ`, `rankUpSpell`) VALUES
-('Number C15 Gimmick Puppet Giant Hunter', 'Rank Up Magic Quick Chaos');
+CREATE TABLE `rankUp` (
+  `hidden_id` int(11) NOT NULL,
+  `xyz` varchar(60) NOT NULL,
+  `cxyz` varchar(60) NOT NULL,
+  `rankUpSpell` varchar(60) NOT NULL
+) 
+
+INSERT INTO `rankUp` (`hidden_id`, `xyz`, `cxyz`, `rankUpSpell`) VALUES
+(1, 'Number 15 Gimmick Puppet Giant Grinder', 'Number C15 Gimmick Puppet Giant Hunter', 'Rank Up Magic Quick Chaos');
+
+CREATE TABLE `rituals` (
+  `ritualSpell` varchar(60) NOT NULL,
+  `ritualMonster` varchar(60) NOT NULL
+) 
 
 INSERT INTO `rituals` (`ritualSpell`, `ritualMonster`) VALUES
 ('Black Luster Ritual', 'Black Luster Soldier');
+
+CREATE TABLE `spell` (
+  `card_name` varchar(60) NOT NULL,
+  `subtype` varchar(60) NOT NULL
+) 
 
 INSERT INTO `spell` (`card_name`, `subtype`) VALUES
 ('Banner of Courage', 'Continuous'),
@@ -126,11 +119,82 @@ INSERT INTO `spell` (`card_name`, `subtype`) VALUES
 ('Polymerization', 'Normal'),
 ('Rank Up Magic Quick Chaos', 'Quick Play');
 
+CREATE TABLE `trap` (
+  `card_name` varchar(60) NOT NULL,
+  `subtype` varchar(60) NOT NULL
+) 
+
 INSERT INTO `trap` (`card_name`, `subtype`) VALUES
 ('Aqua Chorus', 'Continuous '),
 ('Compulsory Evacuation Device', 'Normal'),
 ('Magic Jammer', 'Counter');
 
+CREATE TABLE `yugiohusers` (
+  `id` int(11) NOT NULL,
+  `username` varchar(60) NOT NULL,
+  `password` varchar(60) NOT NULL
+) 
+
 INSERT INTO `yugiohusers` (`id`, `username`, `password`) VALUES
 (1, 'user', '123'),
 (2, 'user2', '12345');
+
+ALTER TABLE `card`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
+
+ALTER TABLE `decks`
+  ADD PRIMARY KEY (`deck_id`),
+  ADD UNIQUE KEY `user_id` (`user_id`);
+
+ALTER TABLE `fusings`
+  ADD PRIMARY KEY (`hidden_id`);
+
+ALTER TABLE `fusionMon`
+  ADD PRIMARY KEY (`hidden_id`);
+
+ALTER TABLE `monster`
+  ADD PRIMARY KEY (`card_name`);
+
+ALTER TABLE `rankUp`
+  ADD PRIMARY KEY (`hidden_id`),
+  ADD KEY `cxyz` (`cxyz`),
+  ADD KEY `xyz` (`xyz`),
+  ADD KEY `rankUpSpell` (`rankUpSpell`);
+
+ALTER TABLE `rituals`
+  ADD PRIMARY KEY (`ritualSpell`),
+  ADD UNIQUE KEY `ritualMonster` (`ritualMonster`);
+
+ALTER TABLE `spell`
+  ADD PRIMARY KEY (`card_name`);
+
+ALTER TABLE `trap`
+  ADD PRIMARY KEY (`card_name`);
+
+ALTER TABLE `yugiohusers`
+  ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `decks`
+  MODIFY `deck_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+ALTER TABLE `fusings`
+  MODIFY `hidden_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+ALTER TABLE `fusionMon`
+  MODIFY `hidden_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+ALTER TABLE `rankUp`
+  MODIFY `hidden_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+ALTER TABLE `yugiohusers`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+ALTER TABLE `decks`
+  ADD CONSTRAINT `users` FOREIGN KEY (`user_id`) REFERENCES `yugiohusers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `rankUp`
+  ADD CONSTRAINT `rankUp_ibfk_1` FOREIGN KEY (`cxyz`) REFERENCES `monster` (`card_name`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `rankUp_ibfk_2` FOREIGN KEY (`xyz`) REFERENCES `monster` (`card_name`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `rankUp_ibfk_3` FOREIGN KEY (`rankUpSpell`) REFERENCES `spell` (`card_name`) ON DELETE CASCADE ON UPDATE CASCADE;
+COMMIT;
