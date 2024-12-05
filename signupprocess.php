@@ -4,9 +4,9 @@ session_start();
 
 // Database connection
 $servername = "localhost";
-$username = "mhussain7";
-$password = "mhussain7";
-$dbname = "mhussain7";
+$username = "srahman22";
+$password = "srahman22"; // Replace with your actual password
+$dbname = "srahman22"; // Replace with your actual database name
 $table = "yugiohusers";
 
 // Create connection

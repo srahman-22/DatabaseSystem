@@ -8,20 +8,21 @@ $loggedIn = isset($_SESSION['username']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Me - Yugioh Deck Builder</title>
+    <title>About Yugioh Deck Builder</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
     <header>
-        <h1>About Me</h1>
+        <h1>About Yugioh Deck Builder</h1>
         <nav>
     <ul>
         <li><a href="index.php">Home</a></li>
-        <li><a href="about.php">About Me</a></li>
+        <li><a href="about.php">About Builder</a></li>
         <li><a href="deckbuilder.php">Deck Builder</a></li>
         <?php if (isset($_SESSION['username'])): ?>
             <li><a href="logout.php">Logout</a></li>
+            <li><a href="display_user_deck.php">Saved Deck</a></li>
         <?php else: ?>
             <li><a href="login.php">Login</a></li>
             <li><a href="signup.php">Sign Up</a></li>
