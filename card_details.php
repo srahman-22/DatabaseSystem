@@ -18,13 +18,14 @@ $card_name = isset($_GET['card_name']) ? $_GET['card_name'] : '';
 
 // If no card is specified, redirect back to the Deck Builder page
 if (empty($card_name)) {
-    header("Location: test.php");
+    header(header: "Location: test.php");
     exit();
 }
 
 // Query for card details based on type
 $card_details = [];
 $card_type = '';
+
 
 $sql = "
     SELECT card_name, subtype, attribute, effect_type, atk, def, level, 'Monster' as type
@@ -66,7 +67,7 @@ if ($result->num_rows > 0) {
 <body>
     <header>
         <h1>Card Details</h1>
-        <nav>
+    <nav>
         <ul>
             <li><a href="index.php">Home</a></li>
             <li><a href="about.php">About Builder</a></li>
@@ -74,6 +75,7 @@ if ($result->num_rows > 0) {
         </ul>
     </nav>
     </header>
+
     <main>
         <section>
             <h2><?= htmlspecialchars($card_name) ?></h2>
@@ -91,9 +93,10 @@ if ($result->num_rows > 0) {
 
         <?php if ($card_type == 'Monster') : ?>
             <section>
-                <h3>Fusion and Ritual Details</h3>
+                <h3>Fusion, Ritual, and Rank-Up Details</h3>
+                
+                <!-- Fusion Details -->
                 <?php
-                // Query for fusion details
                 $fusion_sql = "
                     SELECT fm.fusionMaterial, fm.quantity
                     FROM fusionMon fm
@@ -111,7 +114,7 @@ if ($result->num_rows > 0) {
                     }
                 }
 
-                // Query for ritual details
+                // Ritual Details
                 $ritual_sql = "
                     SELECT r.ritualSpell
                     FROM rituals r
@@ -126,6 +129,24 @@ if ($result->num_rows > 0) {
                     echo "<h4>Ritual Requirements</h4>";
                     while ($row = $ritual_result->fetch_assoc()) {
                         echo "<p>Requires Ritual Spell: " . htmlspecialchars($row['ritualSpell']) . "</p>";
+                    }
+                }
+
+                // Chaos XYZ and Rank-Up Details
+                $rankup_sql = "
+                    SELECT rankUpSpell
+                    FROM rankUp
+                    WHERE cXYZ = ?
+                ";
+                $rankup_stmt = $conn->prepare($rankup_sql);
+                $rankup_stmt->bind_param("s", $card_name);
+                $rankup_stmt->execute();
+                $rankup_result = $rankup_stmt->get_result();
+
+                if ($rankup_result->num_rows > 0) {
+                    echo "<h4>Chaos XYZ and Rank-Up Details</h4>";
+                    while ($row = $rankup_result->fetch_assoc()) {
+                        echo "<p> Available Rank Up Cards to Use: " . htmlspecialchars($row['rankUpSpell']) . "</p>";
                     }
                 }
                 ?>

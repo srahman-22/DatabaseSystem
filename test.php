@@ -48,23 +48,23 @@ $result = $conn->query($sql);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deck Builder</title>
+    <title>Cards</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>About Me</h1>
-    </header>
-    <nav>
+        <h1>Cards</h1>
+        <nav>
         <ul>
-            <li><a href="index.php">Home</a></li>
-            <li><a href="about.php">About Me</a></li>
-            <li><a href="test.php">Deck Builder</a></li>
+        <li><a href="index.php">Home</a></li>
+            <li><a href="about.php">About Builder</a></li>
+            <li><a href="test.php">Cards</a></li>
         </ul>
     </nav>
+    </header>
     <main>
         <section>
-            <h2>Deck Builder</h2>
+            <h2>Cards</h2>
             <form method="GET" action="test.php">
                 <label for="filter">Filter by:</label>
                 <select name="filter" id="filter">
@@ -81,7 +81,8 @@ $result = $conn->query($sql);
                     // Output data of each row
                     while ($row = $result->fetch_assoc()) {
                         echo '<div class="card-item">';
-                        echo '<h3>' . htmlspecialchars($row['card_name']) . '</h3>';
+                        // Add a link to the card name that directs to `card_details.php`
+                        echo '<h3><a href="card_details.php?card_name=' . urlencode($row['card_name']) . '">' . htmlspecialchars($row['card_name']) . '</a></h3>';
                         echo '</div>';
                     }
                 } else {
@@ -91,9 +92,6 @@ $result = $conn->query($sql);
             </div>
         </section>
     </main>
-    <footer>
-        <p>© 2024 Yu-Gi-Oh Deck Builder</p>
-    </footer>
 </body>
 </html>
 <?php
