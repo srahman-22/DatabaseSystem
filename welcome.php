@@ -1,5 +1,11 @@
 <?php
 session_start();
+
+if (!isset($_SESSION['username'])) {
+    header('Location: login.html'); // Redirect to login if user is not authenticated
+    exit();
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,9 +20,15 @@ session_start();
         <h1>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
         <nav>
     <ul>
-            <li><a href="index.php">Home</a></li>
-            <li><a href="about.php">About Builder</a></li>
-            <li><a href="test.php">Cards</a></li>
+        <li><a href="index.php">Home</a></li>
+        <li><a href="about.php">About Me</a></li>
+        <li><a href="deckbuilder.php">Deck Builder</a></li>
+        <?php if (isset($_SESSION['username'])): ?>
+            <li><a href="logout.php">Logout</a></li>
+        <?php else: ?>
+            <li><a href="login.php">Login</a></li>
+            <li><a href="signup.php">Sign Up</a></li>
+        <?php endif; ?>
     </ul>
 </nav>
 

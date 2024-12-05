@@ -1,5 +1,6 @@
 <?php
 session_start();
+$loggedIn = isset($_SESSION['username']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -7,18 +8,24 @@ session_start();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Yugioh Deck Builder</title>
+    <title>About Me - Yugioh Deck Builder</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
     <header>
-        <h1>About Yugioh Deck Builder</h1>
+        <h1>About Me</h1>
         <nav>
     <ul>
-            <li><a href="index.php">Home</a></li>
-            <li><a href="about.php">About Builder</a></li>
-            <li><a href="test.php">Cards</a></li>
+        <li><a href="index.php">Home</a></li>
+        <li><a href="about.php">About Me</a></li>
+        <li><a href="deckbuilder.php">Deck Builder</a></li>
+        <?php if (isset($_SESSION['username'])): ?>
+            <li><a href="logout.php">Logout</a></li>
+        <?php else: ?>
+            <li><a href="login.php">Login</a></li>
+            <li><a href="signup.php">Sign Up</a></li>
+        <?php endif; ?>
     </ul>
 </nav>
 

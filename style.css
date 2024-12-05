@@ -140,8 +140,8 @@ button:hover {
 /* Center the Load More Button */
 #load-more {
     display: block;
-    margin: 20px auto;
-    /* Centers the button horizontally */
+    margin: 40px auto;
+    /* Increased spacing above the button */
     padding: 10px 20px;
     background-color: #8b0000;
     color: white;
@@ -164,4 +164,16 @@ button:hover {
     /* Glow effect */
     background-color: #fef7dc;
     /* Slightly lighter background */
+}
+
+/* View Details Button Adjustment */
+.card-item button:last-of-type {
+    margin-top: 10px;
+    /* Adds spacing below the + and - buttons */
+}
+
+/* Save Deck Button Adjustment */
+#save-deck {
+    margin-top: 30px;
+    /* Increased spacing below selected cards */
 }
