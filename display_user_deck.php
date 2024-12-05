@@ -6,7 +6,7 @@ $servername = "localhost";
 $username = "srahman22";
 $password = "srahman22"; // Replace with your actual password
 $dbname = "srahman22"; // Replace with your actual database name
-$table = "yugiohusers";
+
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -36,7 +36,42 @@ if ($stmt_user->num_rows > 0) {
     $stmt_user->fetch();
     $stmt_user->close();
 
-    // Fetch the user's deck
+    // Handle card removal
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_card'])) {
+        $card_to_remove = $_POST['remove_card'];
+
+        // Fetch the user's current deck
+        $sql_fetch_deck = "SELECT cards FROM decks WHERE user_id = ?";
+        $stmt_fetch_deck = $conn->prepare($sql_fetch_deck);
+        $stmt_fetch_deck->bind_param("i", $user_id);
+        $stmt_fetch_deck->execute();
+        $stmt_fetch_deck->store_result();
+        $stmt_fetch_deck->bind_result($cards_json);
+
+        if ($stmt_fetch_deck->num_rows > 0) {
+            $stmt_fetch_deck->fetch();
+            $deck = json_decode($cards_json, true);
+
+            // Reduce the quantity of the card or remove it if quantity is 1
+            if (isset($deck[$card_to_remove])) {
+                $deck[$card_to_remove]['quantity']--;
+                if ($deck[$card_to_remove]['quantity'] <= 0) {
+                    unset($deck[$card_to_remove]);
+                }
+
+                // Update the deck in the database
+                $updated_deck_json = json_encode($deck);
+                $sql_update_deck = "UPDATE decks SET cards = ? WHERE user_id = ?";
+                $stmt_update_deck = $conn->prepare($sql_update_deck);
+                $stmt_update_deck->bind_param("si", $updated_deck_json, $user_id);
+                $stmt_update_deck->execute();
+                $stmt_update_deck->close();
+            }
+        }
+        $stmt_fetch_deck->close();
+    }
+
+    // Fetch the updated deck
     $sql_deck = "SELECT cards FROM decks WHERE user_id = ?";
     $stmt_deck = $conn->prepare($sql_deck);
     $stmt_deck->bind_param("i", $user_id);
@@ -51,7 +86,11 @@ if ($stmt_user->num_rows > 0) {
         if ($cards) {
             $deckOutput = "<h2>Your Deck:</h2><ul>";
             foreach ($cards as $card_name => $card_info) {
-                $deckOutput .= "<li>" . htmlspecialchars($card_info['name']) . " (x" . $card_info['quantity'] . ") - " . htmlspecialchars($card_info['type']) . "</li>";
+                $deckOutput .= "<li>" . htmlspecialchars($card_info['name']) . 
+                " (x" . $card_info['quantity'] . ") - " . htmlspecialchars($card_info['type']) . "
+                <form method='POST' style='display:inline;'>
+                    <button type='submit' name='remove_card' value='" . htmlspecialchars($card_name) . "'>Remove</button>
+                </form></li>";
             }
             $deckOutput .= "</ul>";
         } else {
@@ -68,13 +107,13 @@ if ($stmt_user->num_rows > 0) {
 
 $conn->close();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saved Deck</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
