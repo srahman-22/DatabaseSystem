@@ -127,9 +127,6 @@ $card_type = $card_details['type'];
             </section>
         <?php endif; ?>
     </main>
-    <footer>
-        <p>© 2024 Yu-Gi-Oh Deck Builder</p>
-    </footer>
 </body>
 </html>
 <?php
