@@ -127,8 +127,7 @@ $loggedIn = isset($_SESSION['username']) && !empty($_SESSION['username']);
                             detailsData.cards.forEach(card => {
                                 if (data.cards[card.name]) {
                                     selectedCards[card.name] = {
-                                        name: card.name,
-                                        type: card.type || "unknown",
+                                        ...card,
                                         quantity: data.cards[card.name].quantity
                                     };
                                 }
@@ -145,7 +144,6 @@ $loggedIn = isset($_SESSION['username']) && !empty($_SESSION['username']);
         })
         .catch(error => console.error('Error preloading deck:', error));
 }
-
 
 
         // Add a card to the selected list
@@ -189,27 +187,42 @@ $loggedIn = isset($_SESSION['username']) && !empty($_SESSION['username']);
 
         // Save deck
         function saveDeck() {
-            const endpoint = 'modify_deck.php';
-            const payload = {
-                cards: selectedCards,
-                ...(deckId && { deck_id: deckId }) // Include deck_id if editing an existing deck
-            };
+    console.log("Attempting to save deck..."); // Debug message
 
-            fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    if (data.success) {
-                        selectedCards = {};
-                        renderSelectedCards();
-                    }
-                })
-                .catch(error => console.error('Error saving deck:', error));
-        }
+    const endpoint = 'modify_deck.php';
+    const payload = {
+        cards: selectedCards,
+        ...(deckId && { deck_id: deckId }) // Include deck_id if editing an existing deck
+    };
+
+    fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Backend response:", data); // Log backend response
+            if (data.success) {
+                alert(data.message); // Show success message
+                Object.keys(selectedCards).forEach(key => delete selectedCards[key]);
+                renderSelectedCards(); // Clear UI
+            } else {
+                alert('Failed to save deck: ' + data.message); // Show error
+            }
+        })
+        .catch(error => {
+            console.error('Error saving deck:', error);
+            alert('An unexpected error occurred while saving the deck.');
+        });
+}
+
+
 
         // Event listeners
         document.getElementById('apply-filter').addEventListener('click', () => {

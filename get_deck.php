@@ -23,43 +23,70 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
-if (!isset($_GET['deck_id'])) {
-    echo json_encode(["success" => false, "message" => "Deck ID is required."]);
-    ob_end_clean(); // Clear any extra output
-    exit();
-}
+$username = $_SESSION['username']; // Get the logged-in username
 
-$deck_id = intval($_GET['deck_id']);
-$username = $_SESSION['username'];
+// Handle deck deletion
+if (isset($_GET['delete_deck'])) {
+    $deleteDeckId = intval($_GET['delete_deck']);
 
-// Query to fetch the user's deck
-$sql = "
-    SELECT d.cards
-    FROM decks d
-    INNER JOIN yugiohusers u ON d.user_id = u.id
-    WHERE d.deck_id = ? AND u.username = ?";
-$stmt = $conn->prepare($sql);
-if (!$stmt) {
-    echo json_encode(["success" => false, "message" => "Failed to prepare SQL: " . $conn->error]);
-    ob_end_clean(); // Clear any extra output
-    exit();
-}
-$stmt->bind_param('is', $deck_id, $username);
-$stmt->execute();
-$result = $stmt->get_result();
+    // SQL query to delete the specified deck for the logged-in user
+    $deleteSql = "DELETE d 
+                  FROM decks d 
+                  INNER JOIN yugiohusers u ON d.user_id = u.id 
+                  WHERE d.deck_id = ? AND u.username = ?";
+    $deleteStmt = $conn->prepare($deleteSql);
+    $deleteStmt->bind_param('is', $deleteDeckId, $username);
 
-if ($deck = $result->fetch_assoc()) {
-    $decoded_cards = json_decode($deck['cards'], true);
-    if (json_last_error() === JSON_ERROR_NONE) {
-        ob_end_clean(); // Clear any extra output
-        echo json_encode(["success" => true, "cards" => $decoded_cards]);
+    if ($deleteStmt->execute()) {
+        echo json_encode(["success" => true, "message" => "Deck deleted successfully."]);
     } else {
-        echo json_encode(["success" => false, "message" => "Failed to decode cards JSON."]);
+        echo json_encode(["success" => false, "message" => "Failed to delete deck."]);
     }
-} else {
-    echo json_encode(["success" => false, "message" => "No deck found with the specified ID."]);
+    ob_end_clean(); // Clear any extra output
+    $deleteStmt->close();
+    $conn->close();
+    exit();
 }
 
+// Handle fetching a specific deck
+if (isset($_GET['deck_id'])) {
+    $deck_id = intval($_GET['deck_id']);
+
+    // Query to fetch the user's deck
+    $sql = "
+        SELECT d.cards
+        FROM decks d
+        INNER JOIN yugiohusers u ON d.user_id = u.id
+        WHERE d.deck_id = ? AND u.username = ?";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        echo json_encode(["success" => false, "message" => "Failed to prepare SQL: " . $conn->error]);
+        ob_end_clean(); // Clear any extra output
+        exit();
+    }
+    $stmt->bind_param('is', $deck_id, $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($deck = $result->fetch_assoc()) {
+        $decoded_cards = json_decode($deck['cards'], true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            ob_end_clean(); // Clear any extra output
+            echo json_encode(["success" => true, "cards" => $decoded_cards]);
+        } else {
+            echo json_encode(["success" => false, "message" => "Failed to decode cards JSON."]);
+        }
+    } else {
+        echo json_encode(["success" => false, "message" => "No deck found with the specified ID."]);
+    }
+    $stmt->close();
+    $conn->close();
+    ob_end_flush(); // Ensure only JSON output
+    exit();
+}
+
+echo json_encode(["success" => false, "message" => "Invalid request."]);
 $conn->close();
 ob_end_flush(); // Ensure only JSON output
+exit();
 ?>

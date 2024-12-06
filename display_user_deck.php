@@ -38,6 +38,66 @@ $result = $stmt->get_result();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Decks</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* CSS for horizontal button alignment */
+        .button-container {
+            display: flex;
+            gap: 10px; /* Add space between buttons */
+        }
+        .button-container button,
+        .button-container form {
+            margin: 0; /* Remove default margins */
+        }
+    </style>
+    <script>
+        // JavaScript to handle deck deletion
+        function deleteDeck(deckId) {
+            fetch('delete_deck.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ deck_id: deckId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message); // Show success message
+                    document.getElementById(`deck-container-${deckId}`).remove(); // Remove the deck from the page
+                } else {
+                    alert(data.message || "An error occurred while deleting the deck.");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("An unexpected error occurred.");
+            });
+        }
+
+        // JavaScript for handling the Starting Hand button
+        function drawStartingHand(deckId) {
+            fetch(`starting_hand.php?deck_id=${deckId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const startingHandArea = document.getElementById('starting-hand');
+                    startingHandArea.innerHTML = ""; // Clear previous results
+
+                    if (data.success) {
+                        const cards = data.cards.map(card => `<li>${card}</li>`).join("");
+                        startingHandArea.innerHTML = `
+                            <h3>Starting Hand:</h3>
+                            <ul>${cards}</ul>
+                        `;
+                    } else {
+                        startingHandArea.innerHTML = `
+                            <p class="error">${data.message || "An error occurred while drawing the starting hand."}</p>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("An unexpected error occurred.");
+                });
+        }
+    </script>
 </head>
 <body>
     <header>
@@ -55,8 +115,9 @@ $result = $stmt->get_result();
         <section>
             <?php if ($result->num_rows > 0): ?>
                 <h2>Your Saved Decks</h2>
+                <div id="starting-hand" class="starting-hand-area"></div> <!-- Area to show starting hand -->
                 <?php while ($row = $result->fetch_assoc()): ?>
-                    <div class="deck-container">
+                    <div class="deck-container" id="deck-container-<?= htmlspecialchars($row['deck_id']) ?>">
                         <h3>Deck ID: <?= htmlspecialchars($row['deck_id']) ?></h3>
                         <table class="deck-table">
                             <thead>
@@ -82,10 +143,14 @@ $result = $stmt->get_result();
                                 <?php endif; ?>
                             </tbody>
                         </table>
-                        <form method="GET" action="deckbuilder.php">
-                            <input type="hidden" name="deck_id" value="<?= htmlspecialchars($row['deck_id']) ?>">
-                            <button type="submit">Edit Deck</button>
-                        </form>
+                        <div class="button-container">
+                            <form method="GET" action="deckbuilder.php">
+                                <input type="hidden" name="deck_id" value="<?= htmlspecialchars($row['deck_id']) ?>">
+                                <button type="submit">Edit Deck</button>
+                            </form>
+                            <button onclick="drawStartingHand(<?= htmlspecialchars($row['deck_id']) ?>)">Starting Hand</button>
+                            <button onclick="deleteDeck(<?= htmlspecialchars($row['deck_id']) ?>)">Delete Deck</button>
+                        </div>
                     </div>
                 <?php endwhile; ?>
             <?php else: ?>
