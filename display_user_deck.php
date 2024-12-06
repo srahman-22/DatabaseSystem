@@ -107,7 +107,12 @@ $result = $stmt->get_result();
                 <li><a href="index.php">Home</a></li>
                 <li><a href="about.php">About</a></li>
                 <li><a href="deckbuilder.php">Deck Builder</a></li>
-                <li><a href="logout.php">Logout</a></li>
+                <?php if ($loggedIn): ?>
+                    <li><a href="logout.php">Logout</a></li>
+                    <li><a href="display_user_deck.php">My Decks</a></li>
+                <?php else: ?>
+                    <li><a href="login.php">Login</a></li>
+                <?php endif; ?>
             </ul>
         </nav>
     </header>

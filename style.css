@@ -205,3 +205,50 @@ button:hover {
     background-color: #f8e8d8;
     color: #333;
 }
+
+#features ul {
+    list-style: none;
+    /* Removes the bullet points */
+    padding: 0;
+    /* Removes the default padding */
+    margin: 0;
+    /* Removes the default margin */
+}
+
+#features ul li {
+    margin-bottom: 10px;
+    /* Optional: Add some spacing between list items */
+}
+
+#technology ul {
+    list-style: none;
+    /* Removes the bullet points */
+    padding: 0;
+    /* Removes the default padding */
+    margin: 0;
+    /* Removes the default margin */
+}
+
+#technology ul li {
+    margin-bottom: 10px;
+    /* Optional: Add some spacing between list items */
+}
+
+/* Starting Hand List */
+#starting-hand ul {
+    list-style: none;
+    /* Removes the bullet points */
+    padding: 0;
+    /* Removes the default padding */
+    margin: 0;
+    /* Removes the default margin */
+}
+
+#starting-hand ul li {
+    margin-bottom: 5px;
+    /* Adds spacing between the items */
+    color: #ffd700;
+    /* Optional: Add styling for the list items */
+    font-weight: bold;
+    /* Optional: Make the items bold */
+}

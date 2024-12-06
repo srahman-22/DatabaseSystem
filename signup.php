@@ -16,18 +16,18 @@ $loggedIn = isset($_SESSION['username']);
     <header>
         <h1>Sign Up</h1>
         <nav>
-    <ul>
-        <li><a href="index.php">Home</a></li>
-        <li><a href="about.php">About Me</a></li>
-        <li><a href="deckbuilder.php">Deck Builder</a></li>
-        <?php if (isset($_SESSION['username'])): ?>
-            <li><a href="logout.php">Logout</a></li>
-        <?php else: ?>
-            <li><a href="login.php">Login</a></li>
-            <li><a href="signup.php">Sign Up</a></li>
-        <?php endif; ?>
-    </ul>
-</nav>
+            <ul>
+                <li><a href="index.php">Home</a></li>
+                <li><a href="about.php">About</a></li>
+                <li><a href="deckbuilder.php">Deck Builder</a></li>
+                <?php if ($loggedIn): ?>
+                    <li><a href="logout.php">Logout</a></li>
+                    <li><a href="display_user_deck.php">My Decks</a></li>
+                <?php else: ?>
+                    <li><a href="login.php">Login</a></li>
+                <?php endif; ?>
+            </ul>
+        </nav>
 
     </header>
     <main>
