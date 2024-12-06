@@ -18,14 +18,13 @@ $loggedIn = isset($_SESSION['username']) && !empty($_SESSION['username']);
         <nav>
             <ul>
                 <li><a href="index.php">Home</a></li>
-                <li><a href="about.php">About Builder</a></li>
+                <li><a href="about.php">About</a></li>
                 <li><a href="deckbuilder.php">Deck Builder</a></li>
                 <?php if ($loggedIn): ?>
                     <li><a href="logout.php">Logout</a></li>
-                    <li><a href="display_user_deck.php">Saved Deck</a></li>
+                    <li><a href="display_user_deck.php">My Decks</a></li>
                 <?php else: ?>
                     <li><a href="login.php">Login</a></li>
-                    <li><a href="signup.php">Sign Up</a></li>
                 <?php endif; ?>
             </ul>
         </nav>
@@ -64,7 +63,10 @@ $loggedIn = isset($_SESSION['username']) && !empty($_SESSION['username']);
         const selectedCards = {};
         const limit = 10;
         let offset = 0;
+        const urlParams = new URLSearchParams(window.location.search);
+        const deckId = urlParams.get('deck_id'); // Get deck_id from the query parameter
 
+        // Load cards dynamically
         function loadCards(type = 'all') {
             fetch(`get_cards.php?type=${type}&limit=${limit}&offset=${offset}`)
                 .then(response => response.json())
@@ -98,6 +100,53 @@ $loggedIn = isset($_SESSION['username']) && !empty($_SESSION['username']);
                 .catch(error => console.error('Error loading cards:', error));
         }
 
+        // Preload deck if editing
+        function preloadDeck() {
+    if (!deckId) return;
+
+    fetch(`get_deck.php?deck_id=${deckId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.cards) {
+                const cardNames = Object.keys(data.cards);
+
+                if (cardNames.length === 0) {
+                    console.error("No cards found in the deck.");
+                    return;
+                }
+
+                // Fetch card details for preloading
+                fetch('get_cards.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ names: cardNames })
+                })
+                    .then(response => response.json())
+                    .then(detailsData => {
+                        if (detailsData.success && detailsData.cards) {
+                            detailsData.cards.forEach(card => {
+                                if (data.cards[card.name]) {
+                                    selectedCards[card.name] = {
+                                        ...card,
+                                        quantity: data.cards[card.name].quantity
+                                    };
+                                }
+                            });
+                            renderSelectedCards();
+                        } else {
+                            console.error('Failed to fetch card details:', detailsData.message);
+                        }
+                    })
+                    .catch(error => console.error('Error fetching card details:', error));
+            } else {
+                console.error('Failed to preload deck:', data.message);
+            }
+        })
+        .catch(error => console.error('Error preloading deck:', error));
+}
+
+
+        // Add a card to the selected list
         function addCard(card) {
             if (selectedCards[card.name]) {
                 if (selectedCards[card.name].quantity < 3) {
@@ -111,6 +160,7 @@ $loggedIn = isset($_SESSION['username']) && !empty($_SESSION['username']);
             renderSelectedCards();
         }
 
+        // Remove a card from the selected list
         function removeCard(card) {
             if (selectedCards[card.name]) {
                 if (selectedCards[card.name].quantity > 1) {
@@ -122,6 +172,7 @@ $loggedIn = isset($_SESSION['username']) && !empty($_SESSION['username']);
             }
         }
 
+        // Render selected cards
         function renderSelectedCards() {
             const selectedSection = document.getElementById('selected-cards');
             selectedSection.innerHTML = '';
@@ -134,11 +185,18 @@ $loggedIn = isset($_SESSION['username']) && !empty($_SESSION['username']);
             }
         }
 
+        // Save deck
         function saveDeck() {
-            fetch('modify_deck.php', {
+            const endpoint = 'modify_deck.php';
+            const payload = {
+                cards: selectedCards,
+                ...(deckId && { deck_id: deckId }) // Include deck_id if editing an existing deck
+            };
+
+            fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cards: selectedCards })
+                body: JSON.stringify(payload)
             })
                 .then(response => response.json())
                 .then(data => {
@@ -151,6 +209,7 @@ $loggedIn = isset($_SESSION['username']) && !empty($_SESSION['username']);
                 .catch(error => console.error('Error saving deck:', error));
         }
 
+        // Event listeners
         document.getElementById('apply-filter').addEventListener('click', () => {
             offset = 0;
             document.getElementById('card-list').innerHTML = '';
@@ -159,7 +218,6 @@ $loggedIn = isset($_SESSION['username']) && !empty($_SESSION['username']);
 
             const loadMoreButton = document.getElementById('load-more');
             loadMoreButton.style.display = 'block';
-
         });
 
         document.getElementById('load-more').addEventListener('click', () => {
@@ -171,6 +229,7 @@ $loggedIn = isset($_SESSION['username']) && !empty($_SESSION['username']);
 
         // Initial load
         loadCards();
+        preloadDeck(); // Preload the deck if editing
     </script>
 </body>
 

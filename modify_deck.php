@@ -3,9 +3,9 @@ header('Content-Type: application/json');
 
 // Database connection
 $host = "localhost";
-$username = "srahman22";
-$password = "srahman22";
-$dbname = "srahman22";
+$username = "mhussain7";
+$password = "mhussain7";
+$dbname = "mhussain7";
 
 $conn = new mysqli($host, $username, $password, $dbname);
 
@@ -33,6 +33,7 @@ if (!$data || !isset($data['cards'])) {
 }
 
 $cardsJson = json_encode($data['cards']);
+$deckId = isset($data['deck_id']) ? intval($data['deck_id']) : null;
 
 // Get the user ID based on the username
 $userQuery = "SELECT id FROM yugiohusers WHERE username = ?";
@@ -49,13 +50,21 @@ if ($userResult->num_rows === 0) {
 $userRow = $userResult->fetch_assoc();
 $user_id = $userRow['id'];
 
-$sql = "INSERT INTO $table (user_id, cards) VALUES (?, ?) 
-        ON DUPLICATE KEY UPDATE cards = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param('iss', $user_id, $cardsJson, $cardsJson);
+if ($deckId) {
+    // Update existing deck
+    $sql = "UPDATE $table SET cards = ? WHERE user_id = ? AND deck_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('sii', $cardsJson, $user_id, $deckId);
+} else {
+    // Insert new deck
+    $sql = "INSERT INTO $table (user_id, cards) VALUES (?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('is', $user_id, $cardsJson);
+}
 
 if ($stmt->execute()) {
-    echo json_encode(["success" => true, "message" => "Deck saved successfully."]);
+    $message = $deckId ? "Deck updated successfully." : "Deck saved successfully.";
+    echo json_encode(["success" => true, "message" => $message]);
 } else {
     echo json_encode(["success" => false, "message" => "Failed to save deck."]);
 }

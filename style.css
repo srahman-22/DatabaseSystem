@@ -83,7 +83,6 @@ footer {
     margin: 10px;
     border-radius: 8px;
     max-width: 150px;
-    /* Reduced width for a more compact layout */
     width: 100%;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: center;
@@ -125,7 +124,6 @@ button:hover {
     align-items: center;
     margin-bottom: 20px;
     gap: 10px;
-    /* Adds spacing between elements */
 }
 
 #type-filter {
@@ -141,7 +139,6 @@ button:hover {
 #load-more {
     display: block;
     margin: 40px auto;
-    /* Increased spacing above the button */
     padding: 10px 20px;
     background-color: #8b0000;
     color: white;
@@ -159,21 +156,52 @@ button:hover {
 /* Highlight selected card */
 .card-item.selected {
     border: 2px solid #ffd700;
-    /* Gold border for highlight */
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
-    /* Glow effect */
     background-color: #fef7dc;
-    /* Slightly lighter background */
 }
 
 /* View Details Button Adjustment */
 .card-item button:last-of-type {
     margin-top: 10px;
-    /* Adds spacing below the + and - buttons */
 }
 
 /* Save Deck Button Adjustment */
 #save-deck {
     margin-top: 30px;
-    /* Increased spacing below selected cards */
+}
+
+/* Deck Container */
+.deck-container {
+    margin-bottom: 20px;
+    background-color: #1f4e79;
+    padding: 20px;
+    border-radius: 10px;
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Deck Table */
+.deck-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.deck-table th,
+.deck-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.deck-table th {
+    background-color: #1e3a5f;
+    color: #ffd700;
+    font-weight: bold;
+}
+
+.deck-table td {
+    background-color: #f8e8d8;
+    color: #333;
 }

@@ -1,9 +1,9 @@
 <?php
 // Database connection parameters
-$servername = "localhost";
-$username = "srahman22";
-$password = "srahman22"; // Replace with your actual password
-$dbname = "srahman22"; // Replace with your actual database name
+$host = "localhost";
+$username = "mhussain7";
+$password = "mhussain7";
+$dbname = "mhussain7";
 
 // Create connection
 $conn = new mysqli($host, $username, $password, $dbname);
@@ -64,14 +64,8 @@ $card_type = $card_details['type'];
         <nav>
             <ul>
                 <li><a href="index.php">Home</a></li>
-                <li><a href="about.php">About Builder</a></li>
+                <li><a href="about.php">About</a></li>
                 <li><a href="deckbuilder.php">Deck Builder</a></li>
-                <?php if (isset($_SESSION['username'])): ?>
-                    <li><a href="logout.php">Logout</a></li>
-                    <li><a href="display_user_deck.php">Saved Deck</a></li>
-                <?php else: ?>
-                    <li><a href="login.php">Login</a></li>
-                    <li><a href="signup.php">Sign Up</a></li>
             </ul>
         </nav>
     </header>
@@ -133,6 +127,9 @@ $card_type = $card_details['type'];
             </section>
         <?php endif; ?>
     </main>
+    <footer>
+        <p>© 2024 Yu-Gi-Oh Deck Builder</p>
+    </footer>
 </body>
 </html>
 <?php

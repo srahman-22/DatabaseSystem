@@ -3,9 +3,9 @@ session_start();
 
 // Database connection
 $servername = "localhost";
-$username = "srahman22";
-$password = "srahman22"; // Replace with your actual password
-$dbname = "srahman22"; // Replace with your actual database name
+$username = "mhussain7";
+$password = "mhussain7";
+$dbname = "mhussain7";
 $table = "yugiohusers";
 
 // Create connection
@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['password'];
 
     // Check the user's credentials
-    $stmt = $conn->prepare("SELECT id, password FROM srahman22.yugiohusers WHERE username = ?");
+    $stmt = $conn->prepare("SELECT id, password FROM mhussain7.yugiohusers WHERE username = ?");
     $stmt->bind_param('s', $username);
     $stmt->execute();
     $stmt->store_result();

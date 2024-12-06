@@ -25,7 +25,6 @@ if (!isset($_SESSION['username'])) {
         <li><a href="deckbuilder.php">Deck Builder</a></li>
         <?php if (isset($_SESSION['username'])): ?>
             <li><a href="logout.php">Logout</a></li>
-            <li><a href="display_user_deck.php">Saved Deck</a></li>
         <?php else: ?>
             <li><a href="login.php">Login</a></li>
             <li><a href="signup.php">Sign Up</a></li>
