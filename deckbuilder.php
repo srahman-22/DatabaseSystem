@@ -127,7 +127,8 @@ $loggedIn = isset($_SESSION['username']) && !empty($_SESSION['username']);
                             detailsData.cards.forEach(card => {
                                 if (data.cards[card.name]) {
                                     selectedCards[card.name] = {
-                                        ...card,
+                                        name: card.name,
+                                        type: card.type || "unknown",
                                         quantity: data.cards[card.name].quantity
                                     };
                                 }
@@ -144,6 +145,7 @@ $loggedIn = isset($_SESSION['username']) && !empty($_SESSION['username']);
         })
         .catch(error => console.error('Error preloading deck:', error));
 }
+
 
 
         // Add a card to the selected list
